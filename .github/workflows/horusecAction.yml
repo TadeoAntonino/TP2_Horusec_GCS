@@ -15,7 +15,7 @@ jobs:
       - name: Run Horusec Analysis
         uses: fike/horusec-action@v0.2.2
         with:
-          args: start -p ./ \
+          arguments: start -p ./ \
             --config-file-path=horusec-config.json \
             --output-format=json \
             --json-output-file=horusec-report.json \
