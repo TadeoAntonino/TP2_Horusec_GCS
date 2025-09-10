@@ -11,28 +11,23 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
-        # Descarga el código fuente del repositorio para analizarlo.
 
-      - name: Run Horusec Analysis (Docker)
-        run: |
-          set -euxo pipefail
-          docker run --rm \
-            -v "${GITHUB_WORKSPACE}:/src" -w /src \
-            horuszup/horusec-cli:latest \
-            sh -lc 'horusec start -p . -o json -O horusec-report.json'
-          echo "✅ Archivos presentes tras Horusec:"
-          ls -la
-          test -f horusec-report.json
-        # Ejecuta Horusec en un contenedor y asegura que horusec-report.json exista.
+      - name: Run Horusec Analysis
+        uses: fike/horusec-action@v0.2.2
+        with:
+          args: start -p ./ \
+            --config-file-path=horusec-config.json \
+            --output-format=json \
+            --json-output-file=horusec-report.json \
+            --return-error
 
       - name: Install jq
         run: |
           sudo apt-get update -y
           sudo apt-get install -y jq
-        # Instala jq para procesar el JSON.
 
       - name: Fail pipeline on HIGH/CRITICAL vulnerabilities
-        if: success()  # solo corre si el paso de Horusec terminó OK
+        if: success()
         run: |
           test -f horusec-report.json || (echo "No se generó horusec-report.json" && exit 1)
           HIGH_CRIT=$(jq '[.analysisVulnerabilities[]? | select(.severity=="HIGH" or .severity=="CRITICAL")] | length' horusec-report.json)
@@ -42,7 +37,6 @@ jobs:
             exit 1
           fi
           echo "OK: No hay HIGH/CRITICAL."
-        # Verifica el reporte y falla el workflow si hay vulnerabilidades de severidad alta o crítica.
 
       - name: Upload Horusec report
         uses: actions/upload-artifact@v4
@@ -50,4 +44,3 @@ jobs:
           name: horusec-report
           path: horusec-report.json
           retention-days: 5
-        # Guarda el reporte como artefacto.
