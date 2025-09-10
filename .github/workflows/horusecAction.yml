@@ -13,12 +13,12 @@ jobs:
         uses: actions/checkout@v4
         # Descarga el código fuente del repositorio para analizarlo.
 
-      - name: Run Horusec Analysis (Docker)
+      - name: Run Horusec (Docker)
         run: |
-          docker run --rm \
-            -v "${GITHUB_WORKSPACE}:/src" -w /src \
+          docker run --rm \-v "${GITHUB_WORKSPACE}:/src" -w /src \
             horuszup/horusec-cli:latest \
-            horusec start -p /src -o json -O /src/horusec-report.json || true
+            sh -lc 'horusec start -p . -o json -O horusec-report.json'
+          ls -la horusec-report.json
         # Ejecuta Horusec en un contenedor Docker y genera el reporte de vulnerabilidades en formato JSON.
 
       - name: Install jq
