@@ -21,6 +21,7 @@ jobs:
             --json-output-file=horusec-report.json \
             --return-error
 
+
       - name: Install jq
         run: |
           sudo apt-get update -y
