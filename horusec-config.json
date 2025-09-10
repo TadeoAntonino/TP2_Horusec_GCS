@@ -1,0 +1,15 @@
+{
+  "projectPath": ".",
+  "recursive": true,
+  "enableGitHistoryAnalysis": false,
+  "ignore": {
+    "paths": [
+      "build",
+      ".gradle",
+      "gradle",
+      "assets",
+      "lib",
+      ".git"
+    ]
+  }
+}
