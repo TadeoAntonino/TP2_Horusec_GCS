@@ -1,0 +1,48 @@
+name: Run Horusec Analysis
+
+on:
+  pull_request:
+    branches: [master]
+
+jobs:
+  horusec-analysis:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        # Descarga el código fuente del repositorio para analizarlo.
+
+      - name: Run Horusec Analysis (Docker)
+        run: |
+          docker run --rm \
+            -v "${GITHUB_WORKSPACE}:/src" -w /src \
+            horuszup/horusec-cli:latest \
+            horusec start -p /src -o json -O /src/horusec-report.json || true
+        # Ejecuta Horusec en un contenedor Docker y genera el reporte de vulnerabilidades en formato JSON.
+
+      - name: Install jq
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y jq
+        # Instala la herramienta jq para procesar archivos JSON en el runner.
+
+      - name:  Fail pipeline on HIGH/CRITICAL vulnerabilities
+        run: |
+          test -f horusec-report.json || (echo "No se generó horusec-report.json" && exit 1)
+          HIGH_CRIT=$(jq '[.analysisVulnerabilities[]? | select(.severity=="HIGH" or .severity=="CRITICAL")] | length' horusec-report.json)
+          echo "Vulnerabilidades HIGH/CRITICAL: $HIGH_CRIT"
+          if [ "$HIGH_CRIT" -gt 0 ]; then
+            echo "Bloqueado: Hay vulnerabilidades ALTA/CRÍTICA."
+            exit 1
+          fi
+          echo "OK: No hay HIGH/CRITICAL."
+        # Verifica el reporte y falla el workflow si hay vulnerabilidades de severidad alta o crítica.
+
+      - name: Upload Horusec report
+        uses: actions/upload-artifact@v4
+        with:
+          name: horusec-report
+          path: horusec-report.json
+          retention-days: 5
+        # Guarda el reporte generado como artefacto para poder descargarlo posteriormente.
