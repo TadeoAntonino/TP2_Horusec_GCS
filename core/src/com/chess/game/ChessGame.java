@@ -134,7 +134,9 @@ public class ChessGame extends Game {
 		return skin;
 	}
 
-	public void exitGame(int test){
+	public void exitGame(int test)
+	{
 		Gdx.app.exit();
 	}
 }
+
