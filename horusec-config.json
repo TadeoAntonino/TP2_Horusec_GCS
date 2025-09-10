@@ -2,6 +2,7 @@
   "projectPath": ".",
   "recursive": true,
   "enableGitHistoryAnalysis": false,
+  "severity": "high",
   "ignore": {
     "paths": [
       "build",
