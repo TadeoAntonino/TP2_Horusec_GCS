@@ -2,7 +2,7 @@ name: Run Horusec Analysis
 
 on:
   pull_request:
-    branches: [master]
+    branches: [develop, master, nico, test-checks]
 
 jobs:
   horusec-analysis:
