@@ -19,7 +19,7 @@ jobs:
           docker run --rm \
             -v "${GITHUB_WORKSPACE}:/src" -w /src \
             horuszup/horusec-cli:latest \
-            sh -lc 'horusec start -p . -o json -O horusec-report.json'
+            sh -lc 'horusec start -p . --config-file ./horusec-config.json -o json -O horusec-report.json'
           echo "✅ Archivos presentes tras Horusec:"
           ls -la
           test -f horusec-report.json
